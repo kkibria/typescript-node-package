@@ -7,9 +7,6 @@ const uglifyEs = require("uglify-es")
 const readFile = promisify(fs.readFile)
 const writeFile = promisify(fs.writeFile)
 
-
-// we should get it from package.json
-const packageName = "typescript-node-package"
 const srcPath = path.join(__dirname, "..", "src")
 const compiledPath = path.join(__dirname, "compiled")
 const distNpmPath = path.join(__dirname, "..")
@@ -27,8 +24,9 @@ async function build() {
     if (minified.error)
         throw minified.error
 
-    await writeFile(path.join(distNpmPath, `${packageName}.min.js`), minified.code)
-    await writeFile(path.join(distNpmPath, `${packageName}.d.ts`), await makeDefinitionsCode())
+    const pkg = JSON.parse(await readFile('package.json'))
+    await writeFile(path.join(distNpmPath, `${pkg.name}.min.js`), minified.code)
+    await writeFile(path.join(distNpmPath, `${pkg.name}.d.ts`), await makeDefinitionsCode())
 }
 
 async function makeDefinitionsCode() {
